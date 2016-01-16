@@ -102,7 +102,7 @@ unsigned char getKeyboardScanCode( void )
 }
 
 // Keyboard LED On/Off
-unsigned char kChangeKeyboardLED(unsigned char capsLockOn, unsigned char numLockOn, unsigned char scrollLockOn)
+unsigned char changeKeyboardLED(unsigned char capsLockOn, unsigned char numLockOn, unsigned char scrollLockOn)
 {
 	int i, j;
 	
@@ -514,13 +514,13 @@ void updateCombinationKeyStatusAndLED( unsigned char scanCode )
 	// Change LED State
 	if ( ledStatusChanged == 1 )
 	{
-		kChangeKeyboardLED(gs_stKeyboardManager.capsLockOn, 
+		changeKeyboardLED(gs_stKeyboardManager.capsLockOn, 
 			gs_stKeyboardManager.numLockOn, gs_stKeyboardManager.scrollLockOn );
 	}
 }
 
 // Transform scan code to ASCII cdoe
-unsigned char kConvertScanCodeToASCIICode( unsigned char scanCode, unsigned char * asciiCode, unsigned char * flags)
+unsigned char convertScanCodeToASCIICode( unsigned char scanCode, unsigned char * asciiCode, unsigned char * flags)
 {
 	unsigned char useCombinedKey;
 	
