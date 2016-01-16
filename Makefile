@@ -9,14 +9,16 @@ kernels: kernel
 	make -C kernel
 	
 mvfiles: bootloader kernel 
-	cat bootloader/bootloader.bin kernel/kernel32/Kernel32.bin > build.bin
+	./imagemaker bootloader/bootloader.bin kernel/kernel32/Kernel32.bin kernel/kernel64/Kernel64.bin 
+	chmod 777 Disk.img
 
 util: utility
 	make -C utility
 	cp utility/imagemaker .
+
 clean: 
-	make -C utility
+	rm Disk.img
+	make -C utility clean
 	rm imagemaker
 	make -C bootloader clean
 	make -C kernel clean
-	rm build.bin

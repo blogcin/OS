@@ -6,6 +6,7 @@ SECTION .text
 jmp 0x07C0:STARTBOOTLOADER
 
 TOTALSECTORCOUNT: dw 0x02 ; OS IMAGE SIZE
+KERNEL32SECTORCOUNT: dw 0x02
 
 STARTBOOTLOADER:
 	mov ax, 0x07C0 ; 0x07C0 - BIOS read first sector (0x07c0), Convert to Segment register value
