@@ -20,7 +20,7 @@ outPortByte:
 	
 	mov rdx, rdi
 	mov rax, rsi
-	out dx, dal
+	out dx, al
 
 	pop rax
 	pop rdx

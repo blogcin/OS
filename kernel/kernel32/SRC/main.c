@@ -4,7 +4,7 @@
 
 void printstring(int iX, int iY, const char *String);
 unsigned char isMemoryEnough();
-unsigned char InitializeMemoryArea();
+unsigned char initializeMemoryArea();
 void copyKerneltoMemory();
 
 void main(void)
