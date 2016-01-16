@@ -6,9 +6,6 @@ void main()
 {
 	printstring(0, 10, "Switch To IA-32e Mode Success!");
 	printstring(0, 12, "IA-32e C Language Kernel Start!");
-	printstring(0, 13, "IA-32e C Language Kernel Start!");
-	printstring(0, 14, "IA-32e C Language Kernel Start!");
-	printstring(0, 15, "IA-32e C Language Kernel Start!");
 	while(1);
 }
 
