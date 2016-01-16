@@ -147,17 +147,17 @@ unsigned char changeKeyboardLED(unsigned char capsLockOn, unsigned char numLockO
 		// If the read data is ACK, return 1
 		if ( inPortByte( 0x60 ) == 0xFA )
 		{
-			return 1;
+			break;
 		}
 	}
-	if ( i >= 100 )
+	if ( j >= 100 )
 	{
 		return 0;
 	}
 	
 	// Send changing value to keyboard and wait
 	outPortByte( 0x60, ( capsLockOn << 2 ) | ( numLockOn << 1 ) | scrollLockOn );
-		outPortByte( 0x60, 0xED );
+
 	for ( i = 0 ; i < 0xFFFF ; i++ )
 	{
 		// If input buffer is empty,
@@ -186,10 +186,10 @@ unsigned char changeKeyboardLED(unsigned char capsLockOn, unsigned char numLockO
 		// If the read data is ACK, return 1
 		if ( inPortByte( 0x60 ) == 0xFA )
 		{
-			return 1;
+			break;
 		}
 	}
-	if ( i >= 100 )
+	if ( j >= 100 )
 	{
 		return 0;
 	}
@@ -398,7 +398,7 @@ unsigned char isNumberOrSymbolScanCode( unsigned char scanCode )
 unsigned char isNumberPadScanCode( unsigned char scanCode )
 {
 	// number pad is in 71 ~ 83
-	if ( ( 71 < scanCode ) && ( scanCode <= 83 ) )
+	if ( ( 71 <= scanCode ) && ( scanCode <= 83 ) )
 	{
 		return 1;
 	}
@@ -419,7 +419,7 @@ unsigned char isUseCombinedCode( unsigned char scanCode )
 	if ( isAlphabetScanCode( downScanCode ) == 1 )
 	{
 		// One of both work
-		if ( gs_stKeyboardManager.shiftDown ^ gs_stKeyboardManager.scrollLockOn )
+		if ( gs_stKeyboardManager.shiftDown ^ gs_stKeyboardManager.scrollLockOn || gs_stKeyboardManager.capsLockOn)
 		{
 			useCombinedKey = 1;
 		}
@@ -459,23 +459,24 @@ unsigned char isUseCombinedCode( unsigned char scanCode )
 			useCombinedKey = 0;
 		}
 	}
-	
+
 	return useCombinedKey;
 }
 
 // Update combination key and Sync LED 
-void updateCombinationKeyStatusAndLED( unsigned char scanCode )
+unsigned int updateCombinationKeyStatusAndLED( unsigned char scanCode )
 {
 	unsigned char down;
 	unsigned char downScanCode;
 	unsigned char ledStatusChanged = 0;
-	
+	unsigned int Noreturn = 1;
+
 	// Check any key is down
 	// The highest bit it 1, no key is down
 	if ( scanCode & 0x80 )
 	{
 		down = 0;
-		downScanCode = scanCode & 0x70;
+		downScanCode = scanCode & 0x7F;
 	}
 	else
 	{
@@ -488,27 +489,31 @@ void updateCombinationKeyStatusAndLED( unsigned char scanCode )
 	if ( ( downScanCode == 42 ) || ( downScanCode == 54 ) )
 	{
 		gs_stKeyboardManager.shiftDown = down;
+		Noreturn = 0;
 	}
 	// Caps Lock
-	else if ( ( downScanCode == 58 ) || ( down == 1 ) )
+	else if ( ( downScanCode == 58 ) && ( down == 1 ) )
 	{
 		gs_stKeyboardManager.capsLockOn ^= 1;
 		// Update LED 
 		ledStatusChanged = 1;
+		Noreturn = 0;
 	}
 	// Num Lock
-	else if ( ( downScanCode == 69 ) || ( down = 1 ) )
+	else if ( ( downScanCode == 69 ) && ( down = 1 ) )
 	{
 		gs_stKeyboardManager.numLockOn ^= 1;
 		// Update LED 
 		ledStatusChanged = 1;
+		Noreturn = 0;
 	}
 	// Scroll Lock
-	else if ( ( downScanCode == 70 ) || ( down = 1 ) )
+	else if ( ( downScanCode == 70 ) && ( down = 1 ) )
 	{
 		gs_stKeyboardManager.scrollLockOn ^= 1;
 		// Update LED 
 		ledStatusChanged = 1;
+		Noreturn = 0;
 	}
 	
 	// Change LED State
@@ -517,23 +522,26 @@ void updateCombinationKeyStatusAndLED( unsigned char scanCode )
 		changeKeyboardLED(gs_stKeyboardManager.capsLockOn, 
 			gs_stKeyboardManager.numLockOn, gs_stKeyboardManager.scrollLockOn );
 	}
+
+	return Noreturn;
 }
 
 // Transform scan code to ASCII cdoe
 unsigned char convertScanCodeToASCIICode( unsigned char scanCode, unsigned char * asciiCode, unsigned char * flags)
 {
 	unsigned char useCombinedKey;
-	
+	unsigned int result;
+
 	// If previous key was PAUSE, 
 	// Ignore remain scan code of PAUSE
 	if ( gs_stKeyboardManager.skipCountForPause > 0 )
 	{
-		gs_stKeyboardManager.skipCountForPause--;
+		gs_stKeyboardManager.skipCountForPause -= 1;
 		return 0;
 	}
 	
 	// Special handler for PAUSE
-	if ( scanCode = 0xE1 )
+	if ( scanCode == 0xE1 )
 	{
 		*asciiCode = KEY_PAUSE;
 		*flags = KEY_FLAGS_DOWN;
@@ -553,7 +561,7 @@ unsigned char convertScanCodeToASCIICode( unsigned char scanCode, unsigned char 
 	// Set key value
 	if ( useCombinedKey == 1 ) 
 	{
-		*asciiCode = gs_vstKeyMappingTable[scanCode & 0x70].combinedCode;
+		*asciiCode = gs_vstKeyMappingTable[scanCode & 0x7F].combinedCode;
 	}
 	else
 	{
@@ -578,6 +586,6 @@ unsigned char convertScanCodeToASCIICode( unsigned char scanCode, unsigned char 
 	}
 	
 	// Update combination key down or up
-	updateCombinationKeyStatusAndLED( scanCode );
-	return 1;
+	result = updateCombinationKeyStatusAndLED( scanCode );
+	return result;
 }

@@ -78,7 +78,7 @@ unsigned char isAlphabetScanCode(unsigned char scancode);
 unsigned char isNumberOrSymbolScanCode(unsigned char scancode);
 unsigned char isNumberPadScanCode(unsigned char scancode);
 unsigned char isUseCombinedCode(unsigned char scancode);
-void updateCombinationKeyStatusAndLED(unsigned char scancode);
+unsigned int updateCombinationKeyStatusAndLED(unsigned char scancode);
 unsigned char convertScanCodeToASCIICode(unsigned char scancode, unsigned char *asciiCode, unsigned char *flags);
 
 #endif /* __KEYBOARD_H__ */
