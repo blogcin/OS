@@ -2,7 +2,7 @@
 
 SECTION .text
 
-global inPortByte, outPortByte
+global inPortByte, outPortByte, loadGDTR, loadTR, loadIDTR
 
 inPortByte:
 	push rdx
@@ -24,4 +24,16 @@ outPortByte:
 
 	pop rax
 	pop rdx
+	ret
+
+loadGDTR:
+	lgdt[rdi]
+	ret
+
+loadTR:
+	ltr di
+	ret
+
+loadIDTR:
+	lidt[rdi]
 	ret
