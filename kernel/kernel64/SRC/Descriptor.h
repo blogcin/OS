@@ -63,7 +63,7 @@
 
 #pragma pack( push, 1 )
 
-typedef struct kGDTRStruct
+typedef struct GDTRStruct
 {
     unsigned short limit;
     unsigned long baseAddress;
@@ -71,7 +71,7 @@ typedef struct kGDTRStruct
     unsigned int dwPading;
 } GDTR, IDTR;
 
-typedef struct kGDTEntry8Struct
+typedef struct GDTEntry8Struct
 {
     unsigned short lowerLimit;
     unsigned short lowerBaseAddress;
@@ -81,7 +81,7 @@ typedef struct kGDTEntry8Struct
     unsigned char upperBaseAddress2;
 } GDTENTRY8;
 
-typedef struct kGDTEntry16Struct
+typedef struct GDTEntry16Struct
 {
     unsigned short lowerLimit;
     unsigned short lowerBaseAddress;
@@ -93,7 +93,7 @@ typedef struct kGDTEntry16Struct
     unsigned int reserved;
 } GDTENTRY16;
 
-typedef struct kTSSDataStruct
+typedef struct TSSDataStruct
 {
     unsigned int reserved1;
     unsigned long rsp[ 3 ];
@@ -104,7 +104,7 @@ typedef struct kTSSDataStruct
     unsigned short ioMapBaseAddress;
 } TSSSEGMENT;
 
-typedef struct kIDTEntryStruct
+typedef struct IDTEntryStruct
 {
     unsigned short lowerBaseAddress;
     unsigned short segmentSelector;
