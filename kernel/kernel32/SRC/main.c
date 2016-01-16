@@ -3,9 +3,9 @@
 #include "ModeSwitch.h"
 
 void printstring(int iX, int iY, const char *String);
-unsigned char IsMemoryEnough();
-unsigned char initIA32e();
-void Copy64KernelToMemory();
+unsigned char isMemoryEnough();
+unsigned char InitializeMemoryArea();
+void copyKerneltoMemory();
 
 void main(void)
 {
@@ -16,7 +16,7 @@ void main(void)
 	printstring(0, 3, "C Language Kernel Start!");
 	printstring(0, 4, "64bit Minimum Memory Check....");
 	
-	if(IsMemoryEnough())
+	if(isMemoryEnough())
 	{
 		printstring(33, 4, "Failed");
 		//printstring(0, 5, "You don't have enough memory");
@@ -26,7 +26,7 @@ void main(void)
 		printstring(33, 4, "Pass");
 
 	printstring(0, 5, "Initializing IA-32e Area....");
-	if(initIA32e())
+	if(initializeMemoryArea())
 	{
 		printstring(35, 5, "Failed");
 	}
@@ -62,7 +62,7 @@ void main(void)
 	
 	printstring(0, 9, "Copy IA-32e Kernel to Memory...");
 	
-	Copy64KernelToMemory();
+	copyKerneltoMemory();
 	printstring(33, 9, "Pass");
 
 	printstring(0, 10, "Boot to IA-32e Kernel");
@@ -84,64 +84,66 @@ void printstring(int iX, int iY, const char *String)
 	}
 }
 
-unsigned char IsMemoryEnough()
+unsigned char initializeMemoryArea()
 {
 	unsigned int *CurrentAddress;
-	
-	CurrentAddress = (unsigned int*)0x100000;
-	
-	while((unsigned int)CurrentAddress < 0x4000000)
-	{
-		*CurrentAddress = 0x12345678;
-		if(*CurrentAddress != 0x12345678)
-		{
-			return 1;
-		}
-		CurrentAddress += ( 0x100000 / 4 );
-	}
-	return 0;
-}
 
-unsigned char initIA32e()
-{
-	unsigned int *CurrentAddress;
-	
-	CurrentAddress = (unsigned int*)0x100000;
+	CurrentAddress = (unsigned int*) 0x100000;
 
-	while((unsigned int)CurrentAddress < 0x600000)
+	while ((unsigned int) CurrentAddress < 0x600000 )
 	{
 		*CurrentAddress = 0x00;
-		
-		if(*CurrentAddress != 0)
+
+		if (*CurrentAddress != 0 )
 		{
 			return 1;
 		}
-	
+
 		CurrentAddress += 1;
 	}
-	
+
 	return 0;
 }
 
-void Copy64KernelToMemory()
+unsigned char isMemoryEnough()
 {
-	unsigned short Kernel32SectorCount, TotalKernelSectorCount;
-	unsigned int *SourceAddress,* DestinationAddress;
+	unsigned int *CurrentAddress;
 
+	CurrentAddress = (unsigned int*) 0x100000;
+
+	while ((unsigned int) CurrentAddress < 0x4000000)
+	{
+		*CurrentAddress = 0x12345678;
+
+		if (*CurrentAddress != 0x12345678)
+		{
+			return 1;
+		}
+
+		CurrentAddress += (0x100000/4);
+	}
+
+	return 0;
+}
+
+void copyKerneltoMemory()
+{
+	unsigned short Kernel32SectorCount;
+	unsigned short TotalKernelSectorCount;
+	unsigned int *SourceAddress;
+	unsigned int *DestinationAddress;
 	int i;
 	
-	TotalKernelSectorCount = *((unsigned short*) 0x7C05);
-	Kernel32SectorCount = *((unsigned short*) 0x7C07);
+	TotalKernelSectorCount = *((unsigned short*)0x7C05);
+	Kernel32SectorCount = *((unsigned short*)0x7C07);
+	
+	SourceAddress = (unsigned int*)(0x10000 + (Kernel32SectorCount*512));
+	DestinationAddress = ( unsigned int * ) 0x200000;
 
-	SourceAddress = (unsigned int *)(0x1000+(Kernel32SectorCount * 512));
-	DestinationAddress = (unsigned int *)0x200000;
-
-	for(i = 0; i < 512 * (TotalKernelSectorCount - Kernel32SectorCount) / 4; i++)
+	for ( i = 0 ; i < 512 * ( TotalKernelSectorCount - Kernel32SectorCount ) / 4; i++ )
 	{
 		*DestinationAddress = *SourceAddress;
 		DestinationAddress += 1;
 		SourceAddress += 1;
-		
 	}
-
 }
