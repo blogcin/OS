@@ -416,7 +416,7 @@ unsigned char isUseCombinedCode( unsigned char scanCode )
 	
 	// If it is alphabet key,
 	// Shift and Capslock key can affect
-	if ( isNumberOrSymbolScanCode( downScanCode ) == 1 )
+	if ( isAlphabetScanCode( downScanCode ) == 1 )
 	{
 		// One of both work
 		if ( gs_stKeyboardManager.shiftDown ^ gs_stKeyboardManager.scrollLockOn )
