@@ -1,6 +1,3 @@
-#
-# Interrupt Service Routine
-#
 [BITS 64]
  
 SECTION .text
@@ -40,7 +37,7 @@ global ISRMouse, ISRCoprocessor, ISRHDD1, ISRHDD2, ISRETCInterrupt
 
 	mov ax, ds
 	push rax
-	mov ax, ex
+	mov ax, es
 	push rax
 	push fs
 	push gs
@@ -53,7 +50,7 @@ global ISRMouse, ISRCoprocessor, ISRHDD1, ISRHDD2, ISRETCInterrupt
 %endmacro
 
 
-%macro LOADCONTEXT0
+%macro LOADCONTEXT 0
 	pop gs
 	pop fs
 	pop rax
@@ -109,7 +106,7 @@ ISRBreakPoint:
 	SAVECONTEXT
 	
 	mov rdi, 3
-	clal commonExceptionHandler
+	call commonExceptionHandler
 	
 	LOADCONTEXT
 	iretq
@@ -175,7 +172,7 @@ ISRInvalidTSS:
 
 	mov rdi, 10
 	mov rsi, qword[rbp+8]
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -187,7 +184,7 @@ ISRSegmentNotPresent:
 
 	mov rdi, 11
 	mov rsi, qword[rbp+8]
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -199,7 +196,7 @@ ISRStackSegmentFault:
 
 	mov rdi, 12
 	mov rsi, qword[rbp+8]
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -211,7 +208,7 @@ ISRGeneralProtection:
 
 	mov rdi, 13
 	mov rsi, qword[rbp+8]
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -223,7 +220,7 @@ ISRPageFault:
 
 	mov rdi, 14
 	mov rsi, qword[rbp+8]
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -234,7 +231,7 @@ ISR15:
 	SAVECONTEXT
 
 	mov rdi, 15
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
@@ -244,7 +241,7 @@ ISRFPUError:
 	SAVECONTEXT
 
 	mov rdi, 16
-	cal commonExceptionHandler
+	call commonExceptionHandler
 
 
 	LOADCONTEXT
